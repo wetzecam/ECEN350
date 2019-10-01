@@ -22,8 +22,8 @@
 
 
 module RegisterFile(BusA, BusB, BusW, RA, RB, RW, RegWr, Clk);
-    output reg [63:0] BusA;
-    output reg [63:0] BusB;
+    output [63:0] BusA;
+    output [63:0] BusB;
     input [63:0] BusW;
     input [4:0] RW;
     input [4:0] RA;
@@ -31,13 +31,17 @@ module RegisterFile(BusA, BusB, BusW, RA, RB, RW, RegWr, Clk);
     input RegWr;
     input Clk;
     reg [63:0] registers [31:0];
-  
-  
-  
-  
-  
-  
+    
+    //internal tmp registers for always block assignment of outputs
+    reg [63:0] BusAr;
+    reg [63:0] BusBr;
+    
     always @ (negedge Clk) begin
+        
+        BusAr <= #2 registers[RA];
+        BusBr <= #2 registers[RB];
+        
+        
         if(RegWr) begin
             case(RW)
                 5'd31: begin
@@ -50,24 +54,7 @@ module RegisterFile(BusA, BusB, BusW, RA, RB, RW, RegWr, Clk);
         end
     end
     
-    
-    always@ (posedge Clk) begin
-        if(^registers[RA]===1'bX) begin
-            #2 assign BusA = {64{1'b0}};
-        end
-        else begin
-            #2 assign BusA = registers[RA]; 
-        end
-        
-        if(^registers[RB]===1'bX) begin
-                    #2 assign BusB = {64{1'b0}};
-                end
-                else begin
-                    #2 assign BusB = registers[RB]; 
-                end
-        
-    
-    end
-    
+    assign BusA = BusAr;
+    assign BusB = BusBr;
 
 endmodule
